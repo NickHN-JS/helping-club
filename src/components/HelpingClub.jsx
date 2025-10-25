@@ -19,7 +19,6 @@ const HelpingClub = () => {
   // Price Calculator State
   const [priceCalc, setPriceCalc] = useState({
     workType: '',
-    subject: '',
     pages: '',
     urgency: 'normal'
   });
@@ -53,35 +52,15 @@ const HelpingClub = () => {
     });
   };
 
-  // Subject pricing multipliers
-  const subjectMultipliers = {
-    'Mathematics': 1.2,
-    'Physics': 1.3,
-    'Chemistry': 1.3,
-    'Biology': 1.2,
-    'Computer Science': 1.4,
-    'Engineering': 1.4,
-    'Economics': 1.1,
-    'Accountancy': 1.2,
-    'Business Studies': 1.1,
-    'History': 1.0,
-    'Geography': 1.0,
-    'Political Science': 1.0,
-    'English': 1.0,
-    'Hindi': 1.0,
-    'Other Languages': 1.0,
-    'General Studies': 1.0
-  };
-
   const calculatePrice = () => {
-    if (!priceCalc.workType || !priceCalc.subject || !priceCalc.pages) {
+    if (!priceCalc.workType || !priceCalc.pages) {
       showNotification('⚠️ Please fill in all calculator fields!', 'error');
       return;
     }
 
     const pages = parseInt(priceCalc.pages);
     const basePrice = priceCalc.workType === 'Assignment' ? 50 : 40; // ₹50 for Assignment, ₹40 for Notebook
-    const subjectMultiplier = subjectMultipliers[priceCalc.subject] || 1.0;
+    const subjectMultiplier = 1.0;
     const urgencyMultiplier = priceCalc.urgency === 'express' ? 1.5 : 1.0;
 
     const subtotal = basePrice * pages * subjectMultiplier;
@@ -163,9 +142,9 @@ const HelpingClub = () => {
 
   const sendEmail = async (data) => {
     try {
-      const serviceId = 'service_qz04h9e';
-      const templateId = 'template_ssrn958';
-      const publicKey = 'QpqGp3wJOKj8S82d1';
+      const serviceId = 'service_faa4xb8';
+      const templateId = 'template_i69ohdl';
+      const publicKey = 'mF5LjX2D5kcGqm2bc';
 
       const templateParams = {
         to_email: 'krishnanofficial@gmail.com',
@@ -390,47 +369,6 @@ Timestamp: ${data.Timestamp}
                   </select>
                 </div>
 
-                {/* Subject */}
-                <div>
-                  <label className="block text-gray-200 font-semibold mb-2 text-lg flex items-center gap-2">
-                    <span>📚</span> Subject *
-                  </label>
-                  <select
-                    name="subject"
-                    value={priceCalc.subject}
-                    onChange={handlePriceCalcChange}
-                    className="w-full px-5 py-4 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-300"
-                  >
-                    <option value="" className="bg-gray-800">Select subject</option>
-                    <optgroup label="Science & Math" className="bg-gray-800">
-                      <option value="Mathematics">Mathematics (×1.2)</option>
-                      <option value="Physics">Physics (×1.3)</option>
-                      <option value="Chemistry">Chemistry (×1.3)</option>
-                      <option value="Biology">Biology (×1.2)</option>
-                    </optgroup>
-                    <optgroup label="Technical" className="bg-gray-800">
-                      <option value="Computer Science">Computer Science (×1.4)</option>
-                      <option value="Engineering">Engineering (×1.4)</option>
-                    </optgroup>
-                    <optgroup label="Commerce" className="bg-gray-800">
-                      <option value="Economics">Economics (×1.1)</option>
-                      <option value="Accountancy">Accountancy (×1.2)</option>
-                      <option value="Business Studies">Business Studies (×1.1)</option>
-                    </optgroup>
-                    <optgroup label="Humanities" className="bg-gray-800">
-                      <option value="History">History (×1.0)</option>
-                      <option value="Geography">Geography (×1.0)</option>
-                      <option value="Political Science">Political Science (×1.0)</option>
-                    </optgroup>
-                    <optgroup label="Languages" className="bg-gray-800">
-                      <option value="English">English (×1.0)</option>
-                      <option value="Hindi">Hindi (×1.0)</option>
-                      <option value="Other Languages">Other Languages (×1.0)</option>
-                    </optgroup>
-                    <option value="General Studies" className="bg-gray-800">General Studies (×1.0)</option>
-                  </select>
-                </div>
-
                 {/* Number of Pages */}
                 <div>
                   <label className="block text-gray-200 font-semibold mb-2 text-lg flex items-center gap-2">
@@ -481,18 +419,12 @@ Timestamp: ${data.Timestamp}
                       <div className="text-right font-semibold">Work Type:</div>
                       <div className="text-left">{calculatedPrice.workType}</div>
                       
-                      <div className="text-right font-semibold">Subject:</div>
-                      <div className="text-left">{calculatedPrice.subject}</div>
-                      
                       <div className="text-right font-semibold">Total Pages:</div>
                       <div className="text-left">{calculatedPrice.pages} pages</div>
                       
                       <div className="text-right font-semibold">Base Price:</div>
                       <div className="text-left">₹{calculatedPrice.basePrice}/page</div>
-                      
-                      <div className="text-right font-semibold">Subject Multiplier:</div>
-                      <div className="text-left">×{calculatedPrice.subjectMultiplier}</div>
-                      
+                                            
                       <div className="text-right font-semibold">Delivery:</div>
                       <div className="text-left">{calculatedPrice.urgency === 'express' ? 'Express (24hrs)' : 'Normal (1-3 days)'}</div>
                     </div>
@@ -743,7 +675,7 @@ Timestamp: ${data.Timestamp}
       {/* Footer */}
       <footer className="relative py-12 px-4 border-t border-purple-500/30 bg-gray-900/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
             {/* Logo and About */}
             <div className="text-center md:text-left">
               <h3 className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
@@ -754,18 +686,18 @@ Timestamp: ${data.Timestamp}
             </div>
 
             {/* Contact Info */}
-            <div className="text-center">
+            <div className="text-center md:text-right">
               <h4 className="text-xl font-bold text-gray-200 mb-4">Get In Touch 📞</h4>
               <div className="space-y-3">
-                <a href="mailto:contact@thehelpingclub.com" className="flex items-center justify-center gap-2 text-gray-400 hover:text-purple-400 transition-colors">
+                <a href="mailto:venugopalnamit08@gmail.com" className="flex items-center justify-center md:justify-end gap-2 text-gray-400 hover:text-purple-400 transition-colors">
                   <Icon icon="mdi:email" className="w-5 h-5" />
-                  <span className="font-medium">contact@thehelpingclub.com</span>
+                  <span className="font-medium">venugopalnamit08@gmail.com</span>
                 </a>
-                <a href="tel:+919876543210" className="flex items-center justify-center gap-2 text-gray-400 hover:text-purple-400 transition-colors">
+                <a href="tel:+917222990256" className="flex items-center justify-center md:justify-end gap-2 text-gray-400 hover:text-purple-400 transition-colors">
                   <Icon icon="mdi:phone" className="w-5 h-5" />
-                  <span className="font-medium">+91 98765 43210</span>
+                  <span className="font-medium">+91 72229 90256</span>
                 </a>
-                <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-gray-400 hover:text-green-400 transition-colors">
+                <a href="https://wa.me/917222990256" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center md:justify-end gap-2 text-gray-400 hover:text-green-400 transition-colors">
                   <Icon icon="mdi:whatsapp" className="w-5 h-5" />
                   <span className="font-medium">WhatsApp Us</span>
                 </a>
@@ -773,7 +705,7 @@ Timestamp: ${data.Timestamp}
             </div>
 
             {/* Social Media */}
-            <div className="text-center md:text-right">
+            {/* <div className="text-center md:text-right">
               <h4 className="text-xl font-bold text-gray-200 mb-4">Follow Us 🚀</h4>
               <div className="flex justify-center md:justify-end gap-4">
                 <a
@@ -814,7 +746,7 @@ Timestamp: ${data.Timestamp}
                 </a>
               </div>
               <p className="text-sm text-gray-500 font-medium mt-6">🔒 100% Confidential & Secure</p>
-            </div>
+            </div> */}
           </div>
 
           <div className="border-t border-purple-500/30 pt-8 text-center">
