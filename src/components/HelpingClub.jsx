@@ -268,7 +268,7 @@ Timestamp: ${data.Timestamp}
 
           <p className="text-2xl md:text-3xl text-gray-300 font-medium max-w-3xl mx-auto animate-fade-in-up delay-200">
             We handle the grind so that you don't have to! 
-            <span className="inline-block animate-bounce ml-2">😊</span>
+            <span className="inline-block animate-bounce ml-2"></span>
           </p>
 
           <div className="relative group animate-fade-in-up delay-300">
