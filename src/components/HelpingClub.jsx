@@ -16,6 +16,15 @@ const HelpingClub = () => {
     instructions: ''
   });
 
+  // Price Calculator State
+  const [priceCalc, setPriceCalc] = useState({
+    workType: '',
+    subject: '',
+    pages: '',
+    urgency: 'normal'
+  });
+
+  const [calculatedPrice, setCalculatedPrice] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -35,6 +44,62 @@ const HelpingClub = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handlePriceCalcChange = (e) => {
+    setPriceCalc({
+      ...priceCalc,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Subject pricing multipliers
+  const subjectMultipliers = {
+    'Mathematics': 1.2,
+    'Physics': 1.3,
+    'Chemistry': 1.3,
+    'Biology': 1.2,
+    'Computer Science': 1.4,
+    'Engineering': 1.4,
+    'Economics': 1.1,
+    'Accountancy': 1.2,
+    'Business Studies': 1.1,
+    'History': 1.0,
+    'Geography': 1.0,
+    'Political Science': 1.0,
+    'English': 1.0,
+    'Hindi': 1.0,
+    'Other Languages': 1.0,
+    'General Studies': 1.0
+  };
+
+  const calculatePrice = () => {
+    if (!priceCalc.workType || !priceCalc.subject || !priceCalc.pages) {
+      showNotification('⚠️ Please fill in all calculator fields!', 'error');
+      return;
+    }
+
+    const pages = parseInt(priceCalc.pages);
+    const basePrice = priceCalc.workType === 'Assignment' ? 50 : 40; // ₹50 for Assignment, ₹40 for Notebook
+    const subjectMultiplier = subjectMultipliers[priceCalc.subject] || 1.0;
+    const urgencyMultiplier = priceCalc.urgency === 'express' ? 1.5 : 1.0;
+
+    const subtotal = basePrice * pages * subjectMultiplier;
+    const total = subtotal * urgencyMultiplier;
+
+    setCalculatedPrice({
+      workType: priceCalc.workType,
+      subject: priceCalc.subject,
+      pages: pages,
+      basePrice: basePrice,
+      subjectMultiplier: subjectMultiplier,
+      urgency: priceCalc.urgency,
+      urgencyMultiplier: urgencyMultiplier,
+      subtotal: Math.round(subtotal),
+      total: Math.round(total)
+    });
+
+    showNotification('💰 Price calculated successfully!', 'success');
   };
 
   const showNotification = (message, type = 'success') => {
@@ -74,9 +139,6 @@ const HelpingClub = () => {
       // Send email using EmailJS
       await sendEmail(dataRow);
       
-      // Save to Excel as backup
-      // await saveToExcel(dataRow);
-      
       showNotification('✅ Thank you! Your enquiry has been recorded and sent successfully.', 'success');
       
       // Reset form
@@ -101,13 +163,12 @@ const HelpingClub = () => {
 
   const sendEmail = async (data) => {
     try {
-      // EmailJS configuration
-      const serviceId = 'service_qz04h9e'; // Replace with your EmailJS service ID
-      const templateId = 'template_ssrn958'; // Replace with your EmailJS template ID
-      const publicKey = 'QpqGp3wJOKj8S82d1'; // Replace with your EmailJS public key
+      const serviceId = 'service_qz04h9e';
+      const templateId = 'template_ssrn958';
+      const publicKey = 'QpqGp3wJOKj8S82d1';
 
       const templateParams = {
-        to_email: 'krishnanofficial@gmail.com', // Replace with owner's email
+        to_email: 'krishnanofficial@gmail.com',
         from_name: data.Name,
         from_email: data.Email,
         timestamp: data.Timestamp,
@@ -146,39 +207,18 @@ Timestamp: ${data.Timestamp}
       return response;
     } catch (error) {
       console.error('❌ Error sending email:', error);
-      // Don't throw error - we still want to save to Excel
       showNotification('⚠️ Email could not be sent, but data has been saved locally.', 'warning');
-    }
-  };
-
-  const saveToExcel = async (data) => {
-    try {
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet([data]);
-
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(wb, ws, 'Enquiries');
-
-      // Generate file name with timestamp
-      const fileName = `enquiry_${new Date().getTime()}.xlsx`;
-
-      // Download the file (browser will save it)
-      XLSX.writeFile(wb, fileName);
-
-      console.log('✅ Data saved to Excel:', fileName);
-
-      // Note: For actual server-side storage, you would need a backend API
-      // This client-side approach downloads the file to user's computer
-      
-    } catch (error) {
-      console.error('❌ Error saving to Excel:', error);
-      throw error;
     }
   };
 
   const scrollToForm = () => {
     document.getElementById('enquiry-form')?.scrollIntoView({ 
+      behavior: 'smooth' 
+    });
+  };
+
+  const scrollToCalculator = () => {
+    document.getElementById('price-calculator')?.scrollIntoView({ 
       behavior: 'smooth' 
     });
   };
@@ -265,15 +305,24 @@ Timestamp: ${data.Timestamp}
             </div>
           </div>
 
-          <button
-            onClick={scrollToForm}
-            className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold px-10 py-5 rounded-full text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 animate-fade-in-up delay-500"
-          >
-            <span>Get Help Now</span>
-            <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"/>
-            </svg>
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-500">
+            <button
+              onClick={scrollToCalculator}
+              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold px-10 py-5 rounded-full text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50"
+            >
+              <span>Calculate Price 💰</span>
+            </button>
+            
+            <button
+              onClick={scrollToForm}
+              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold px-10 py-5 rounded-full text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
+            >
+              <span>Get Help Now</span>
+              <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -304,6 +353,163 @@ Timestamp: ${data.Timestamp}
               <p className="text-3xl md:text-5xl font-black text-center text-gray-100">
                 Don't waste your time on boring assignments.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Price Calculator Section */}
+      <section id="price-calculator" className="relative py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-black text-center mb-12 bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
+            Price Calculator 💰
+          </h2>
+          
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-600 via-cyan-600 to-blue-600 rounded-3xl blur opacity-25"></div>
+            <div className="relative bg-gray-900/90 backdrop-blur-xl border border-green-500/30 rounded-3xl p-8 md:p-12">
+              <p className="text-center text-gray-300 text-lg mb-8">
+                Get an instant estimate for your assignment or notebook work!
+              </p>
+              
+              <div className="space-y-6">
+                {/* Work Type */}
+                <div>
+                  <label className="block text-gray-200 font-semibold mb-2 text-lg flex items-center gap-2">
+                    <span>✍️</span> Type of Work *
+                  </label>
+                  <select
+                    name="workType"
+                    value={priceCalc.workType}
+                    onChange={handlePriceCalcChange}
+                    className="w-full px-5 py-4 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-300"
+                  >
+                    <option value="" className="bg-gray-800">Select type</option>
+                    <option value="Assignment" className="bg-gray-800">Assignment (₹50/page base)</option>
+                    <option value="Notebook" className="bg-gray-800">Notebook (₹40/page base)</option>
+                  </select>
+                </div>
+
+                {/* Subject */}
+                <div>
+                  <label className="block text-gray-200 font-semibold mb-2 text-lg flex items-center gap-2">
+                    <span>📚</span> Subject *
+                  </label>
+                  <select
+                    name="subject"
+                    value={priceCalc.subject}
+                    onChange={handlePriceCalcChange}
+                    className="w-full px-5 py-4 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-300"
+                  >
+                    <option value="" className="bg-gray-800">Select subject</option>
+                    <optgroup label="Science & Math" className="bg-gray-800">
+                      <option value="Mathematics">Mathematics (×1.2)</option>
+                      <option value="Physics">Physics (×1.3)</option>
+                      <option value="Chemistry">Chemistry (×1.3)</option>
+                      <option value="Biology">Biology (×1.2)</option>
+                    </optgroup>
+                    <optgroup label="Technical" className="bg-gray-800">
+                      <option value="Computer Science">Computer Science (×1.4)</option>
+                      <option value="Engineering">Engineering (×1.4)</option>
+                    </optgroup>
+                    <optgroup label="Commerce" className="bg-gray-800">
+                      <option value="Economics">Economics (×1.1)</option>
+                      <option value="Accountancy">Accountancy (×1.2)</option>
+                      <option value="Business Studies">Business Studies (×1.1)</option>
+                    </optgroup>
+                    <optgroup label="Humanities" className="bg-gray-800">
+                      <option value="History">History (×1.0)</option>
+                      <option value="Geography">Geography (×1.0)</option>
+                      <option value="Political Science">Political Science (×1.0)</option>
+                    </optgroup>
+                    <optgroup label="Languages" className="bg-gray-800">
+                      <option value="English">English (×1.0)</option>
+                      <option value="Hindi">Hindi (×1.0)</option>
+                      <option value="Other Languages">Other Languages (×1.0)</option>
+                    </optgroup>
+                    <option value="General Studies" className="bg-gray-800">General Studies (×1.0)</option>
+                  </select>
+                </div>
+
+                {/* Number of Pages */}
+                <div>
+                  <label className="block text-gray-200 font-semibold mb-2 text-lg flex items-center gap-2">
+                    <span>📄</span> Number of Pages *
+                  </label>
+                  <input
+                    type="number"
+                    name="pages"
+                    value={priceCalc.pages}
+                    onChange={handlePriceCalcChange}
+                    className="w-full px-5 py-4 bg-gray-800/50 border border-green-500/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-300"
+                    placeholder="Enter number of pages"
+                    min="1"
+                  />
+                </div>
+
+                {/* Urgency */}
+                <div>
+                  <label className="block text-gray-200 font-semibold mb-2 text-lg flex items-center gap-2">
+                    <span>⚡</span> Delivery Urgency *
+                  </label>
+                  <select
+                    name="urgency"
+                    value={priceCalc.urgency}
+                    onChange={handlePriceCalcChange}
+                    className="w-full px-5 py-4 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-300"
+                  >
+                    <option value="normal" className="bg-gray-800">Normal (1-3 days) - Standard Price</option>
+                    <option value="express" className="bg-gray-800">Express (24 hours) - +50% Extra</option>
+                  </select>
+                </div>
+
+                {/* Calculate Button */}
+                <button
+                  onClick={calculatePrice}
+                  className="w-full bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-500 hover:to-cyan-500 text-white font-bold py-5 px-8 rounded-xl text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50"
+                >
+                  Calculate Price 🧮
+                </button>
+
+                {/* Price Display */}
+                {calculatedPrice && (
+                  <div className="mt-8 p-6 bg-gradient-to-r from-green-900/40 to-cyan-900/40 border border-green-500/50 rounded-2xl space-y-4 animate-fade-in-up">
+                    <h3 className="text-2xl font-bold text-center text-green-400 mb-4">
+                      Price Breakdown 📊
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 text-gray-200">
+                      <div className="text-right font-semibold">Work Type:</div>
+                      <div className="text-left">{calculatedPrice.workType}</div>
+                      
+                      <div className="text-right font-semibold">Subject:</div>
+                      <div className="text-left">{calculatedPrice.subject}</div>
+                      
+                      <div className="text-right font-semibold">Total Pages:</div>
+                      <div className="text-left">{calculatedPrice.pages} pages</div>
+                      
+                      <div className="text-right font-semibold">Base Price:</div>
+                      <div className="text-left">₹{calculatedPrice.basePrice}/page</div>
+                      
+                      <div className="text-right font-semibold">Subject Multiplier:</div>
+                      <div className="text-left">×{calculatedPrice.subjectMultiplier}</div>
+                      
+                      <div className="text-right font-semibold">Delivery:</div>
+                      <div className="text-left">{calculatedPrice.urgency === 'express' ? 'Express (24hrs)' : 'Normal (1-3 days)'}</div>
+                    </div>
+                    
+                    <div className="border-t border-green-500/30 pt-4 mt-4">
+                      <div className="flex justify-between items-center text-2xl font-bold">
+                        <span className="text-green-400">Total Estimated Price:</span>
+                        <span className="text-yellow-400">₹{calculatedPrice.total}</span>
+                      </div>
+                    </div>
+                    
+                    <p className="text-center text-sm text-gray-400 mt-4">
+                      💡 This is an estimate. Final price may vary based on complexity and special requirements.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
