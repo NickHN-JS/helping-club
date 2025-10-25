@@ -59,7 +59,7 @@ const HelpingClub = () => {
     }
 
     const pages = parseInt(priceCalc.pages);
-    const basePrice = priceCalc.workType === 'Assignment' ? 50 : 40; // ₹50 for Assignment, ₹40 for Notebook
+    const basePrice = priceCalc.workType === 'Assignment' ? 20 : 15; // ₹50 for Assignment, ₹40 for Notebook
     const subjectMultiplier = 1.0;
     const urgencyMultiplier = priceCalc.urgency === 'express' ? 1.5 : 1.0;
 
@@ -364,8 +364,8 @@ Timestamp: ${data.Timestamp}
                     className="w-full px-5 py-4 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all duration-300"
                   >
                     <option value="" className="bg-gray-800">Select type</option>
-                    <option value="Assignment" className="bg-gray-800">Assignment (₹50/page base)</option>
-                    <option value="Notebook" className="bg-gray-800">Notebook (₹40/page base)</option>
+                    <option value="Assignment" className="bg-gray-800">Assignment (₹20/page base)</option>
+                    <option value="Notebook" className="bg-gray-800">Notebook (₹15/page base)</option>
                   </select>
                 </div>
 
